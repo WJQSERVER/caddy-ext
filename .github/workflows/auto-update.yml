@@ -21,6 +21,7 @@ jobs:
 
       - name: Update Go dependencies
         run: |
+          cd ratelimit
           go get -u ./...  # 更新所有依赖
           go mod tidy      # 清理未使用的依赖
 
