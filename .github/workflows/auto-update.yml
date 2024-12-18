@@ -1,0 +1,39 @@
+name: Update Go Dependencies
+
+on:
+  push:
+    branches:
+      - main  # 你可以根据需要更改为其他分支
+  workflow_dispatch:  # 允许手动触发工作流
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.20'  # 指定 Go 版本
+
+      - name: Update Go dependencies
+        run: |
+          go get -u ./...  # 更新所有依赖
+          go mod tidy      # 清理未使用的依赖
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git diff --exit-code || echo "changes"
+
+      - name: Commit changes
+        if: steps.check_changes.outputs.changes == 'changes'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add go.mod go.sum
+          git commit -m "Update Go dependencies" || echo "No changes to commit"
+          git push origin main  # 根据需要更改为目标分支
