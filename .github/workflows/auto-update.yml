@@ -12,12 +12,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - name: 安装 Go
+        uses: actions/setup-go@v3
         with:
-          go-version: '1.20'  # 指定 Go 版本
+          go-version: 1.23.4
 
       - name: Update Go dependencies
         run: |
@@ -29,7 +29,7 @@ jobs:
         run: |
           git diff --exit-code || echo "changes"
 
-      - name: Commit changes
+      - name: 提交更改
         if: steps.check_changes.outputs.changes == 'changes'
         run: |
           git config --local user.email "action@github.com"
