@@ -1,5 +1,5 @@
-//module github.com/WJQSERVER/caddy-ext/ratelimit
-module ratelimit
+module github.com/WJQSERVER/caddy-ext/ratelimit
+//module ratelimit
 
 go 1.23.4
 
