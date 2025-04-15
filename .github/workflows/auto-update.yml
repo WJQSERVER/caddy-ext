@@ -37,4 +37,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add go.mod go.sum
           git commit -m "Update Go dependencies" || echo "No changes to commit"
-          git push origin main  # 根据需要更改为目标分支
+          git push origin master  # 根据需要更改为目标分支
