@@ -263,6 +263,8 @@ func (v *Var) evaluatePrefix(r *http.Request, forwarded bool) (value string, err
 	return prefix.Masked().String(), nil
 }
 
+// getClientIP 获取客户端 IP 地址
+// 使用 Go 1.22+ 的 netip.ParseAddrPort 优化代码
 func getClientIP(r *http.Request, forwarded bool) (netip.Addr, error) {
 	remote := r.RemoteAddr
 	if forwarded {
@@ -270,11 +272,21 @@ func getClientIP(r *http.Request, forwarded bool) (netip.Addr, error) {
 			remote = strings.TrimSpace(strings.Split(fwdFor, ",")[0])
 		}
 	}
-	ipStr, _, err := net.SplitHostPort(remote)
+
+	// 使用 netip.ParseAddrPort, 它可以一步完成地址和端口的解析,
+	// 自动处理 IPv4, IPv6 和端口, 比 net.SplitHostPort 更健壮简洁.
+	addr, err := netip.ParseAddrPort(remote)
 	if err != nil {
-		ipStr = remote // OK; probably didn't have a port
+		// 如果解析失败 (例如, remote string 中没有端口), 尝试直接将其作为地址解析
+		addr, err := netip.ParseAddr(remote)
+		if err != nil {
+			// 如果两种方式都失败, 返回原始的 net.SplitHostPort 错误, 以保持兼容性
+			_, _, splitErr := net.SplitHostPort(remote)
+			return netip.Addr{}, splitErr
+		}
+		return addr, nil
 	}
-	return netip.ParseAddr(ipStr)
+	return addr.Addr(), nil
 }
 
 func parseRate(rate string) (size time.Duration, limit int, err error) {
